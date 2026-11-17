@@ -14,6 +14,7 @@ import {
   Code2,
 } from 'lucide-react';
 import { TrackerState } from '@/types/tracker';
+import { createClient as createBrowserSupabaseClient } from '@/utils/supabase/client';
 
 interface SupabaseConfigModalProps {
   isOpen: boolean;
@@ -80,18 +81,44 @@ CREATE POLICY "Allow public read and write" ON devops_tracker FOR ALL USING (tru
   const handleForceSync = async () => {
     setPushLoading(true);
     try {
-      const res = await fetch('/api/tracker', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: currentState }),
-      });
-      const data = await res.json();
-      if (data.success) {
+      let saved = false;
+
+      // 1. Direct browser client write
+      const browserClient = createBrowserSupabaseClient();
+      if (browserClient) {
+        try {
+          const { error } = await browserClient.from('devops_tracker').upsert({
+            id: 'default',
+            data: currentState,
+            updated_at: new Date().toISOString(),
+          });
+          if (!error) {
+            saved = true;
+          }
+        } catch (e) {
+          console.warn('Browser direct sync exception:', e);
+        }
+      }
+
+      // 2. Server API route fallback
+      if (!saved) {
+        const res = await fetch('/api/tracker', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: currentState }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          saved = true;
+        }
+      }
+
+      if (saved) {
         showToast('Tracker data successfully synced to Supabase!');
         onDataSynced?.();
         fetchStatus();
       } else {
-        showToast(`Sync failed: ${data.error || data.message || 'Check table existence'}`);
+        showToast('Sync failed. Please check network connection.');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);

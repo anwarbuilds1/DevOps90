@@ -59,10 +59,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenDbModal}
             className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all cursor-pointer"
-            title="Supabase Connection Error. Click to inspect."
+            title="Supabase sync error. Click to retry or inspect."
           >
             <AlertCircle className="w-3.5 h-3.5" />
-            <span>Supabase Error</span>
+            <span>Sync Error (Retry)</span>
           </button>
         );
     }

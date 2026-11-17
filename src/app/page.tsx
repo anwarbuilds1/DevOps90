@@ -44,7 +44,6 @@ import { getDefaultState } from '@/constants/curriculum';
 
 export default function TrackerApp() {
   const [state, setState] = useState<TrackerState>(getDefaultState());
-  const [isLoaded, setIsLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<ActiveTab>('today');
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('checking');
   const [drawerTarget, setDrawerTarget] = useState<DrawerTarget | null>(null);
@@ -76,10 +75,10 @@ export default function TrackerApp() {
     saveTimerRef.current = setTimeout(async () => {
       let savedSuccessfully = false;
 
-      // 1. Direct browser Supabase write
-      const browserClient = createBrowserSupabaseClient();
-      if (browserClient) {
-        try {
+      // 1. Direct browser Supabase write (fastest)
+      try {
+        const browserClient = createBrowserSupabaseClient();
+        if (browserClient) {
           const { error } = await browserClient.from('devops_tracker').upsert({
             id: 'default',
             data: trackerData,
@@ -88,30 +87,32 @@ export default function TrackerApp() {
           if (!error) {
             savedSuccessfully = true;
           } else {
-            console.error('Supabase direct save error:', error);
+            console.warn('Browser direct Supabase write warning:', error);
           }
-        } catch (e) {
-          console.error('Supabase direct save exception:', e);
         }
+      } catch (e) {
+        console.warn('Browser direct Supabase write exception:', e);
       }
 
       // 2. Server API route write fallback
-      try {
-        const res = await fetch('/api/tracker', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ data: trackerData }),
-        });
-        const json = await res.json();
-        if (json.success) {
-          savedSuccessfully = true;
+      if (!savedSuccessfully) {
+        try {
+          const res = await fetch('/api/tracker', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: trackerData }),
+          });
+          const json = await res.json();
+          if (json.success) {
+            savedSuccessfully = true;
+          }
+        } catch (err) {
+          console.error('Server API save error:', err);
         }
-      } catch (err) {
-        console.error('Server API save error:', err);
       }
 
       setSyncStatus(savedSuccessfully ? 'synced' : 'error');
-    }, 500);
+    }, 400);
   }, []);
 
   // Master state update wrapper
@@ -126,24 +127,38 @@ export default function TrackerApp() {
     [pushToDatabase]
   );
 
+  // Apply theme whenever state.theme changes
+  useEffect(() => {
+    applyTheme(state.theme);
+  }, [state.theme, applyTheme]);
+
   // Initial load directly from Supabase
   useEffect(() => {
     const fetchSupabaseData = async () => {
       setSyncStatus('checking');
       let loadedData: TrackerState | null = null;
 
-      // 1. Try direct browser Supabase fetch
-      const browserClient = createBrowserSupabaseClient();
-      if (browserClient) {
-        try {
-          const { data: row, error } = await browserClient
+      // 1. Try direct browser Supabase fetch with 8-second timeout
+      try {
+        const browserClient = createBrowserSupabaseClient();
+        if (browserClient) {
+          const timeoutPromise = new Promise<{ data: null; error: Error }>((_, reject) =>
+            setTimeout(() => reject(new Error('Supabase client timeout')), 8000)
+          );
+
+          const queryPromise = browserClient
             .from('devops_tracker')
             .select('data')
             .eq('id', 'default')
             .maybeSingle();
 
+          const { data: row, error } = (await Promise.race([queryPromise, timeoutPromise])) as {
+            data: { data: TrackerState } | null;
+            error: Error | null;
+          };
+
           if (!error) {
-            if (row && row.data) {
+            if (row && row.data && typeof row.data === 'object') {
               loadedData = normalizeState(row.data);
             } else {
               // Table is empty, seed with initial curriculum and save to Supabase
@@ -158,15 +173,15 @@ export default function TrackerApp() {
           } else {
             console.warn('Browser direct fetch error:', error);
           }
-        } catch (e) {
-          console.warn('Browser direct fetch exception:', e);
         }
+      } catch (e) {
+        console.warn('Browser direct fetch exception/timeout:', e);
       }
 
       // 2. Fallback to server API route if browser client didn't load
       if (!loadedData) {
         try {
-          const res = await fetch('/api/tracker');
+          const res = await fetch('/api/tracker', { signal: AbortSignal.timeout(8000) });
           const json = await res.json();
           if (json.data) {
             loadedData = normalizeState(json.data);
@@ -178,19 +193,14 @@ export default function TrackerApp() {
 
       if (loadedData) {
         setState(loadedData);
-        applyTheme(loadedData.theme);
         setSyncStatus('synced');
       } else {
-        const def = getDefaultState();
-        setState(def);
-        applyTheme(def.theme);
         setSyncStatus('error');
       }
-      setIsLoaded(true);
     };
 
     fetchSupabaseData();
-  }, [applyTheme]);
+  }, []);
 
   // Handle theme toggle
   const handleThemeToggle = () => {
@@ -324,17 +334,6 @@ export default function TrackerApp() {
       j.follow <= todayIso &&
       ['Applied', 'Screening', 'Interview'].includes(j.status)
   ).length;
-
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-[#090d16] text-slate-500 font-mono text-sm">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <span>Initializing DevOps 90 Tracker...</span>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 transition-colors pb-24 md:pb-12">
