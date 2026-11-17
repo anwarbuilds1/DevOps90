@@ -77,7 +77,7 @@ CREATE POLICY "Allow public read and write" ON devops_tracker FOR ALL USING (tru
     }
   }, [isOpen]);
 
-  const handlePushLocalData = async () => {
+  const handleForceSync = async () => {
     setPushLoading(true);
     try {
       const res = await fetch('/api/tracker', {
@@ -87,7 +87,7 @@ CREATE POLICY "Allow public read and write" ON devops_tracker FOR ALL USING (tru
       });
       const data = await res.json();
       if (data.success) {
-        showToast('Local tracker data successfully synced to Supabase!');
+        showToast('Tracker data successfully synced to Supabase!');
         onDataSynced?.();
         fetchStatus();
       } else {
@@ -191,12 +191,12 @@ CREATE POLICY "Allow public read and write" ON devops_tracker FOR ALL USING (tru
             </div>
           ) : (
             <div className="space-y-1.5">
-              <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm font-semibold">
+              <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 text-sm font-semibold">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>Running in Local Storage</span>
+                <span>Supabase Not Connected</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400">
-                All data is safely stored in your browser.
+                Data is stored directly in Supabase. Check your Supabase URL and Publishable Key.
               </p>
             </div>
           )}
@@ -234,12 +234,12 @@ CREATE POLICY "Allow public read and write" ON devops_tracker FOR ALL USING (tru
         {/* Action Buttons */}
         <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap gap-2.5 justify-end">
           <button
-            onClick={handlePushLocalData}
+            onClick={handleForceSync}
             disabled={pushLoading}
             className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
           >
             <UploadCloud className={`w-3.5 h-3.5 ${pushLoading ? 'animate-spin' : ''}`} />
-            <span>Sync Local Data to Supabase</span>
+            <span>Push Data to Supabase</span>
           </button>
 
           <button

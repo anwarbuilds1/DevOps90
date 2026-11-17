@@ -38,11 +38,10 @@ export async function GET() {
     }
   }
 
-  // Fallback: Local Client mode
   return NextResponse.json({
     configured: false,
     data: null,
-    message: 'Database not configured in environment. Using local client state.',
+    message: 'Supabase database not configured in environment variables.',
   });
 }
 
@@ -87,6 +86,6 @@ export async function POST(request: Request) {
   return NextResponse.json({
     configured: false,
     success: false,
-    message: 'Database not configured. Saved in browser local storage only.',
+    message: 'Supabase database not configured in environment variables.',
   });
 }

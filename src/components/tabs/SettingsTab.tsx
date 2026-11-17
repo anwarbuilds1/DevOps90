@@ -202,8 +202,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {syncStatus === 'synced'
-                  ? 'Active and synchronizing with your Supabase database.'
-                  : 'Currently storing data locally in your browser.'}
+                  ? 'Active and synchronizing directly with your Supabase database.'
+                  : syncStatus === 'saving'
+                  ? 'Saving changes to Supabase...'
+                  : 'Connecting to your Supabase database...'}
               </p>
             </div>
           </div>

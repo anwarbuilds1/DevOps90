@@ -36,7 +36,7 @@ export async function GET() {
   return NextResponse.json({
     configured: false,
     connected: false,
-    mode: 'local_storage',
-    message: 'Operating in browser Local Storage mode. Ready for Supabase.',
+    mode: 'unconfigured',
+    message: 'Supabase credentials not configured in environment variables.',
   });
 }

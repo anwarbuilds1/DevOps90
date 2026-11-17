@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Flame, Database, Sun, Moon, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Flame, Sun, Moon, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { SyncStatus } from '@/lib/storage';
 import { ThemeMode } from '@/types/tracker';
 
@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenDbModal}
             className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all cursor-pointer"
-            title="Supabase Database Connected & Synced"
+            title="Connected to Supabase"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Supabase</span>
@@ -43,31 +43,26 @@ export const Header: React.FC<HeaderProps> = ({
         return (
           <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
             <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            <span>Saving...</span>
+            <span>Saving to Supabase...</span>
+          </div>
+        );
+      case 'checking':
+        return (
+          <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+            <span>Connecting...</span>
           </div>
         );
       case 'error':
-        return (
-          <button
-            onClick={onOpenDbModal}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all cursor-pointer"
-            title="Database Connection Error. Click to inspect."
-          >
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span>DB Error</span>
-          </button>
-        );
-      case 'local_only':
       default:
         return (
           <button
             onClick={onOpenDbModal}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 hover:bg-amber-500/20 transition-all cursor-pointer"
-            title="Running in Local Storage. Click to connect Supabase."
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all cursor-pointer"
+            title="Supabase Connection Error. Click to inspect."
           >
-            <Database className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Local Storage</span>
-            <span className="sm:hidden">Local</span>
+            <AlertCircle className="w-3.5 h-3.5" />
+            <span>Supabase Error</span>
           </button>
         );
     }

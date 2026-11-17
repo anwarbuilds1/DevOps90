@@ -6,7 +6,7 @@ import { Navigation } from '@/components/Navigation';
 import { ItemDrawer, DrawerTarget } from '@/components/ItemDrawer';
 import { LightboxModal } from '@/components/LightboxModal';
 import { SupabaseConfigModal } from '@/components/SupabaseConfigModal';
-import { createClient as createBrowserSupabaseClient, isBrowserSupabaseConfigured } from '@/utils/supabase/client';
+import { createClient as createBrowserSupabaseClient } from '@/utils/supabase/client';
 
 import { TodayTab } from '@/components/tabs/TodayTab';
 import { PlanTab } from '@/components/tabs/PlanTab';
@@ -32,8 +32,6 @@ import {
   ImageItem,
 } from '@/types/tracker';
 import {
-  loadLocalState,
-  saveLocalState,
   normalizeState,
   SyncStatus,
 } from '@/lib/storage';
@@ -67,7 +65,7 @@ export default function TrackerApp() {
     }
   }, []);
 
-  // Save to DB (debounced)
+  // Save to Supabase (debounced)
   const pushToDatabase = useCallback((trackerData: TrackerState) => {
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
@@ -78,7 +76,7 @@ export default function TrackerApp() {
     saveTimerRef.current = setTimeout(async () => {
       let savedSuccessfully = false;
 
-      // 1. Direct browser Supabase sync
+      // 1. Direct browser Supabase write
       const browserClient = createBrowserSupabaseClient();
       if (browserClient) {
         try {
@@ -90,14 +88,14 @@ export default function TrackerApp() {
           if (!error) {
             savedSuccessfully = true;
           } else {
-            console.warn('Browser Supabase direct save warning:', error);
+            console.error('Supabase direct save error:', error);
           }
         } catch (e) {
-          console.warn('Browser Supabase direct save error:', e);
+          console.error('Supabase direct save exception:', e);
         }
       }
 
-      // 2. Server API route sync
+      // 2. Server API route write fallback
       try {
         const res = await fetch('/api/tracker', {
           method: 'POST',
@@ -109,17 +107,11 @@ export default function TrackerApp() {
           savedSuccessfully = true;
         }
       } catch (err) {
-        console.warn('Server API tracker save warning:', err);
+        console.error('Server API save error:', err);
       }
 
-      if (savedSuccessfully) {
-        setSyncStatus('synced');
-      } else if (isBrowserSupabaseConfigured) {
-        setSyncStatus('error');
-      } else {
-        setSyncStatus('local_only');
-      }
-    }, 800);
+      setSyncStatus(savedSuccessfully ? 'synced' : 'error');
+    }, 500);
   }, []);
 
   // Master state update wrapper
@@ -127,7 +119,6 @@ export default function TrackerApp() {
     (updater: (prev: TrackerState) => TrackerState) => {
       setState((prev) => {
         const next = updater(prev);
-        saveLocalState(next);
         pushToDatabase(next);
         return next;
       });
@@ -135,17 +126,13 @@ export default function TrackerApp() {
     [pushToDatabase]
   );
 
-  // Initial load & remote sync check
+  // Initial load directly from Supabase
   useEffect(() => {
-    const local = loadLocalState();
-    setState(local);
-    applyTheme(local.theme);
-    setIsLoaded(true);
+    const fetchSupabaseData = async () => {
+      setSyncStatus('checking');
+      let loadedData: TrackerState | null = null;
 
-    const checkDbSync = async () => {
-      let synced = false;
-
-      // 1. Direct browser client check & initial sync
+      // 1. Try direct browser Supabase fetch
       const browserClient = createBrowserSupabaseClient();
       if (browserClient) {
         try {
@@ -157,77 +144,52 @@ export default function TrackerApp() {
 
           if (!error) {
             if (row && row.data) {
-              const remote = normalizeState(row.data);
-              if ((remote.ts || 0) > (local.ts || 0)) {
-                setState(remote);
-                saveLocalState(remote);
-                applyTheme(remote.theme);
-              } else {
-                browserClient.from('devops_tracker').upsert({
-                  id: 'default',
-                  data: local,
-                  updated_at: new Date().toISOString(),
-                });
-              }
+              loadedData = normalizeState(row.data);
             } else {
-              // Remote empty, push initial
-              browserClient.from('devops_tracker').upsert({
+              // Table is empty, seed with initial curriculum and save to Supabase
+              const initial = getDefaultState();
+              await browserClient.from('devops_tracker').upsert({
                 id: 'default',
-                data: local,
+                data: initial,
                 updated_at: new Date().toISOString(),
               });
-            }
-            synced = true;
-            setSyncStatus('synced');
-          }
-        } catch (e) {
-          console.warn('Browser direct sync failed:', e);
-        }
-      }
-
-      // 2. Server API status check
-      try {
-        const statusRes = await fetch('/api/db/status');
-        const statusJson = await statusRes.json();
-
-        if (statusJson.configured && statusJson.connected) {
-          const dataRes = await fetch('/api/tracker');
-          const dataJson = await dataRes.json();
-
-          if (dataJson.data) {
-            const remote = normalizeState(dataJson.data);
-            if ((remote.ts || 0) > (local.ts || 0)) {
-              setState(remote);
-              saveLocalState(remote);
-              applyTheme(remote.theme);
-            } else if ((local.ts || 0) > (remote.ts || 0)) {
-              fetch('/api/tracker', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: local }),
-              }).catch(() => {});
+              loadedData = initial;
             }
           } else {
-            fetch('/api/tracker', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ data: local }),
-            }).catch(() => {});
+            console.warn('Browser direct fetch error:', error);
           }
-
-          synced = true;
-          setSyncStatus('synced');
-        } else if (!synced) {
-          setSyncStatus('local_only');
-        }
-      } catch {
-        if (!synced) {
-          setSyncStatus('local_only');
+        } catch (e) {
+          console.warn('Browser direct fetch exception:', e);
         }
       }
+
+      // 2. Fallback to server API route if browser client didn't load
+      if (!loadedData) {
+        try {
+          const res = await fetch('/api/tracker');
+          const json = await res.json();
+          if (json.data) {
+            loadedData = normalizeState(json.data);
+          }
+        } catch (e) {
+          console.warn('API tracker fetch exception:', e);
+        }
+      }
+
+      if (loadedData) {
+        setState(loadedData);
+        applyTheme(loadedData.theme);
+        setSyncStatus('synced');
+      } else {
+        const def = getDefaultState();
+        setState(def);
+        applyTheme(def.theme);
+        setSyncStatus('error');
+      }
+      setIsLoaded(true);
     };
 
-    checkDbSync();
+    fetchSupabaseData();
   }, [applyTheme]);
 
   // Handle theme toggle
@@ -477,7 +439,6 @@ export default function TrackerApp() {
             syncStatus={syncStatus}
             onUpdateState={(newState) => {
               setState(newState);
-              saveLocalState(newState);
               pushToDatabase(newState);
               applyTheme(newState.theme);
             }}
