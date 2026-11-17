@@ -6,6 +6,7 @@ import { Navigation } from '@/components/Navigation';
 import { ItemDrawer, DrawerTarget } from '@/components/ItemDrawer';
 import { LightboxModal } from '@/components/LightboxModal';
 import { SupabaseConfigModal } from '@/components/SupabaseConfigModal';
+import { createClient as createBrowserSupabaseClient, isBrowserSupabaseConfigured } from '@/utils/supabase/client';
 
 import { TodayTab } from '@/components/tabs/TodayTab';
 import { PlanTab } from '@/components/tabs/PlanTab';
@@ -53,7 +54,6 @@ export default function TrackerApp() {
   const [isDbModalOpen, setIsDbModalOpen] = useState(false);
 
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const isSyncingWithDbRef = useRef<boolean>(false);
 
   // Apply theme to <html> element
   const applyTheme = useCallback((themeMode: string) => {
@@ -69,8 +69,6 @@ export default function TrackerApp() {
 
   // Save to DB (debounced)
   const pushToDatabase = useCallback((trackerData: TrackerState) => {
-    if (!isSyncingWithDbRef.current) return;
-
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
     }
@@ -78,6 +76,28 @@ export default function TrackerApp() {
     setSyncStatus('saving');
 
     saveTimerRef.current = setTimeout(async () => {
+      let savedSuccessfully = false;
+
+      // 1. Direct browser Supabase sync
+      const browserClient = createBrowserSupabaseClient();
+      if (browserClient) {
+        try {
+          const { error } = await browserClient.from('devops_tracker').upsert({
+            id: 'default',
+            data: trackerData,
+            updated_at: new Date().toISOString(),
+          });
+          if (!error) {
+            savedSuccessfully = true;
+          } else {
+            console.warn('Browser Supabase direct save warning:', error);
+          }
+        } catch (e) {
+          console.warn('Browser Supabase direct save error:', e);
+        }
+      }
+
+      // 2. Server API route sync
       try {
         const res = await fetch('/api/tracker', {
           method: 'POST',
@@ -86,13 +106,18 @@ export default function TrackerApp() {
         });
         const json = await res.json();
         if (json.success) {
-          setSyncStatus('synced');
-        } else {
-          setSyncStatus('local_only');
+          savedSuccessfully = true;
         }
       } catch (err) {
-        console.error('Failed to sync to database:', err);
+        console.warn('Server API tracker save warning:', err);
+      }
+
+      if (savedSuccessfully) {
+        setSyncStatus('synced');
+      } else if (isBrowserSupabaseConfigured) {
         setSyncStatus('error');
+      } else {
+        setSyncStatus('local_only');
       }
     }, 800);
   }, []);
@@ -118,25 +143,64 @@ export default function TrackerApp() {
     setIsLoaded(true);
 
     const checkDbSync = async () => {
+      let synced = false;
+
+      // 1. Direct browser client check & initial sync
+      const browserClient = createBrowserSupabaseClient();
+      if (browserClient) {
+        try {
+          const { data: row, error } = await browserClient
+            .from('devops_tracker')
+            .select('data')
+            .eq('id', 'default')
+            .maybeSingle();
+
+          if (!error) {
+            if (row && row.data) {
+              const remote = normalizeState(row.data);
+              if ((remote.ts || 0) > (local.ts || 0)) {
+                setState(remote);
+                saveLocalState(remote);
+                applyTheme(remote.theme);
+              } else {
+                browserClient.from('devops_tracker').upsert({
+                  id: 'default',
+                  data: local,
+                  updated_at: new Date().toISOString(),
+                });
+              }
+            } else {
+              // Remote empty, push initial
+              browserClient.from('devops_tracker').upsert({
+                id: 'default',
+                data: local,
+                updated_at: new Date().toISOString(),
+              });
+            }
+            synced = true;
+            setSyncStatus('synced');
+          }
+        } catch (e) {
+          console.warn('Browser direct sync failed:', e);
+        }
+      }
+
+      // 2. Server API status check
       try {
         const statusRes = await fetch('/api/db/status');
         const statusJson = await statusRes.json();
 
         if (statusJson.configured && statusJson.connected) {
-          isSyncingWithDbRef.current = true;
-          // Fetch remote data
           const dataRes = await fetch('/api/tracker');
           const dataJson = await dataRes.json();
 
           if (dataJson.data) {
             const remote = normalizeState(dataJson.data);
             if ((remote.ts || 0) > (local.ts || 0)) {
-              // Remote is newer, adopt remote
               setState(remote);
               saveLocalState(remote);
               applyTheme(remote.theme);
             } else if ((local.ts || 0) > (remote.ts || 0)) {
-              // Local is newer, push to remote
               fetch('/api/tracker', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -144,7 +208,6 @@ export default function TrackerApp() {
               }).catch(() => {});
             }
           } else {
-            // Remote has no data yet, push initial local data
             fetch('/api/tracker', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -152,15 +215,15 @@ export default function TrackerApp() {
             }).catch(() => {});
           }
 
+          synced = true;
           setSyncStatus('synced');
-        } else {
-          isSyncingWithDbRef.current = false;
+        } else if (!synced) {
           setSyncStatus('local_only');
         }
-      } catch (err) {
-        console.warn('Could not contact backend for db check:', err);
-        isSyncingWithDbRef.current = false;
-        setSyncStatus('local_only');
+      } catch {
+        if (!synced) {
+          setSyncStatus('local_only');
+        }
       }
     };
 

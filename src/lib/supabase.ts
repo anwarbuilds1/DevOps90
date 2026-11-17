@@ -1,6 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 import { TrackerState } from '@/types/tracker';
 
+// Polyfill WebSocket for Node runtime where realtime is not used
+if (typeof globalThis !== 'undefined' && !globalThis.WebSocket) {
+  (globalThis as unknown as { WebSocket: unknown }).WebSocket = class DummyWebSocket {};
+}
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey =
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
