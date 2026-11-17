@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DevOps 90 Tracker</title>
+<style>
+:root{--bg:#f4f6f9;--cd:#fff;--tx:#14213d;--mu:#5b6678;--ac:#1b6ca8;--a2:#e4f0f9;--ok:#1f8a4c;--wa:#b7791f;--er:#c53030;--bd:#dde3ea;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1520;--cd:#182131;--tx:#e8edf5;--mu:#9aa6b8;--ac:#5aa9e6;--a2:#1d2c40;--ok:#4ac17d;--wa:#e0a84a;--er:#f08080;--bd:#2a3649;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1520;--cd:#182131;--tx:#e8edf5;--mu:#9aa6b8;--ac:#5aa9e6;--a2:#1d2c40;--ok:#4ac17d;--wa:#e0a84a;--er:#f08080;--bd:#2a3649;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-bottom:84px}
+.w{max-width:720px;margin:0 auto;padding:12px}
+h1{font-size:19px;margin:4px 0}h2{font-size:17px;margin:4px 0}h3{font-size:14px;margin:14px 0 6px;color:var(--mu)}
+.mu{color:var(--mu);font-size:13px}
+.hd{display:flex;justify-content:space-between;align-items:baseline}
+.card{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0}
+[data-a=oi],[data-a=od]{cursor:pointer}
+.g{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:560px){.g{grid-template-columns:repeat(4,1fr)}}
+.st{background:var(--cd);border:1px solid var(--bd);border-radius:12px;padding:10px}.st b{display:block;font-size:22px}
+.btn{display:inline-block;background:var(--ac);color:#fff;border:0;border-radius:10px;padding:9px 14px;font:inherit;cursor:pointer;margin:6px 0}
+.btn.s{background:var(--a2);color:var(--ac)}.btn.d{background:var(--er)}
+input,select,textarea{width:100%;font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:9px;margin:3px 0 8px}
+label{display:block;font-size:13px;color:var(--mu)}
+input[type=checkbox]{width:20px;height:20px;margin:0 8px 0 0;vertical-align:middle}
+.ck{display:flex;align-items:center;font-size:15px;color:var(--tx);padding:7px 0}
+.bar{height:8px;background:var(--a2);border-radius:6px;overflow:hidden;margin:6px 0}.bar i{display:block;height:100%;background:var(--ok)}
+details{background:var(--cd);border:1px solid var(--bd);border-radius:12px;margin:8px 0;padding:4px 12px}
+summary{padding:10px 0;font-weight:600;cursor:pointer}
+.dr{display:flex;justify-content:space-between;gap:8px;padding:9px 0;border-top:1px solid var(--bd);cursor:pointer}
+.pl{display:inline-block;font-size:11px;border:1px solid var(--bd);border-radius:8px;padding:1px 6px;margin-left:3px;color:var(--mu)}.pl.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.bd{float:right;font-size:11px;border-radius:8px;padding:2px 8px;background:var(--a2);color:var(--ac)}.bd.ok{background:var(--ok);color:#fff}.bd.wa{background:var(--wa);color:#fff}.bd.er{background:var(--er);color:#fff}
+.seg{display:flex;gap:6px;overflow-x:auto;padding:4px 0}.seg button{flex:none;border:1px solid var(--bd);background:var(--cd);color:var(--tx);border-radius:16px;padding:6px 12px;font:inherit;font-size:13px}.seg button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+.nav button{flex:1;background:none;border:0;color:var(--mu);font:inherit;font-size:12px;padding:8px 2px}.nav button.on{color:var(--ac);font-weight:700}
+.bk{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:5;display:flex;align-items:flex-end;justify-content:center}
+.sh{background:var(--bg);width:100%;max-width:720px;max-height:92%;overflow:auto;border-radius:16px 16px 0 0;padding:14px 14px calc(20px + env(safe-area-inset-bottom,0px))}
+.lk{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd);word-break:break-all}.lk a{color:var(--ac)}
+.x{background:none;border:0;color:var(--er);font-size:18px;cursor:pointer}
+.two{display:grid;grid-template-columns:1fr 1.6fr auto;gap:6px;align-items:start}
+.imgs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}figure{margin:0;position:relative}figure img{width:100%;border-radius:10px;border:1px solid var(--bd);background:#fff}figcaption{font-size:12px;color:var(--mu)}figure .x{position:absolute;top:2px;right:4px;background:var(--cd);border-radius:50%;width:26px;height:26px;line-height:20px;padding:0}
+#z{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9;display:flex;align-items:center;justify-content:center}#z[hidden]{display:none}#z img{max-width:96%;max-height:92%;background:#fff}
+.hist{display:flex;align-items:flex-end;gap:4px;height:90px}.hist i{flex:1;background:var(--ac);border-radius:4px 4px 0 0;min-height:2px}
+#tt{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--tx);color:var(--bg);padding:8px 14px;border-radius:10px;z-index:10}
+</style></head><body>
+<div class="w" id="app"></div><div id="sh"></div><div id="z" hidden></div>
+<script>
+const K='devops90',$=s=>document.querySelector(s),e=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const WK=[['Linux, SSH, troubleshooting','Setup|Users and permissions|Processes and systemd|Logs, cron, disks|SSH hardening on EC2|Troubleshooting drills'],
+['Networking, Docker, CI (Project 1)','Networking and DNS|HTTP, TLS, nginx|Scripting|Docker hardening|CI to ECR and deploy|Project 1 wrap-up'],
+['AWS core','IAM|VPC by hand|Network security|EC2, ALB, ASG|RDS and S3|Route53, ACM, CloudWatch'],
+['Terraform','Terraform basics|State|Language features|Modules|Project 2 build|Environments'],
+['Terraform CI and SAA prep','GitHub OIDC to AWS|Plan on pull request|Apply on merge|Project 2 wrap-up|SAA study 1|SAA study 2'],
+['Certification and Kubernetes core','SAA revision, kind cluster|Exam day, Deployments|Services, config, secrets|Probes, requests, limits|Debugging|Namespaces and RBAC'],
+['Kubernetes intermediate, start applying','Ingress|Storage and StatefulSets|Autoscaling|Helm|Network policies|Resume and applications'],
+['EKS','EKS with Terraform|AWS Load Balancer Controller|ExternalDNS and cert-manager|Pod IAM|Node scaling|App on EKS'],
+['GitOps (Project 3)','ArgoCD install|Argo applications|Kustomize|CI to GitOps|Hardening the flagship|Project 3 wrap-up'],
+['Observability and reliability','Prometheus stack|PromQL and dashboards|Alerting|App instrumentation|SLOs and logs|Failure drill, postmortem'],
+['Security and cost','Secrets|Pipeline scanning|Policy as code|IAM and audit|Cost control|Merge into Project 3'],
+['Polish and positioning','Case study|Demo video|GitHub cleanup|Resume v2|Interview prep 1|Interview prep 2'],
+['Interview mode','Project walkthrough|Troubleshooting scenarios|CI/CD design|AWS architecture|Terraform and Kubernetes deep dive|Behavioral and offers']];
+const T=[];WK.forEach((w,i)=>{w[1].split('|').forEach((t,j)=>T[i*7+j]=t);T[i*7+6]=i==12?'Final review':'Review and rest'});
+const JS=['Wishlist','Applied','Screening','Interview','Offer','Rejected','Ghosted'],TOP=['Linux','Networking','Docker','CI/CD','AWS','Terraform','Kubernetes','Observability','Security','Behavioral','Design'];
+const C={
+posts:{n:'Posts',t:'topic',f:[['topic','Topic','text'],['date','Date','date'],['status','Status','sel',['Draft','Scheduled','Published']],['url','Post link','url'],['likes','Reactions','num'],['cmts','Comments','num'],['notes','Notes','ta']],m:i=>[i.date,i.likes&&i.likes+' reactions',i.url&&'link']},
+projects:{n:'Projects',t:'name',f:[['name','Project name','text'],['status','Status','sel',['Planned','Building','Done','Public']],['repo','Repo link','url'],['demo','Demo or case study link','url'],['chk','Checklist','chk',['README','Diagram','Teardown steps','Cost notes','Public repo','Demo video']],['notes','Notes','ta']],m:i=>[Object.values(i.chk||{}).filter(Boolean).length+'/6 checks',(i.imgs||[]).length&&i.imgs.length+' images']},
+jobs:{n:'Jobs',t:'company',f:[['company','Company','text'],['role','Role','text'],['status','Status','sel',JS],['url','Job link','url'],['applied','Applied on','date'],['follow','Follow up on','date'],['contact','Contact or referral','text'],['band','Salary band','text'],['notes','Notes','ta']],m:i=>[i.role,i.applied&&'applied '+i.applied,i.follow&&'follow up '+i.follow]},
+qs:{n:'Interview questions',t:'q',f:[['q','Question','text'],['topic','Topic','sel',TOP],['conf','Confidence 1 to 5','sel',['1','2','3','4','5']],['a','My answer','ta']],m:i=>[i.topic,'confidence '+(i.conf||'-')]},
+res:{n:'Resources',t:'title',f:[['title','Title','text'],['url','Link','url'],['tag','Tag','text'],['notes','Notes','ta']],m:i=>[i.tag,i.url]},
+scores:{n:'Practice scores',t:'name',f:[['name','Exam or test','text'],['date','Date','date'],['score','Score in percent','num'],['notes','Notes','ta']],m:i=>[i.date,i.score!==''&&i.score!=null&&i.score+'%']}};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const def=()=>({start:'2026-11-16',days:{},theme:'',ts:0,col:{posts:[],jobs:[],qs:[],res:[],scores:[],projects:[
+{id:'p1',name:'Project 1: App on EC2 with nginx, TLS, auto-deploy',status:'Planned',links:[],imgs:[]},
+{id:'p2',name:'Project 2: Terraform 3-tier stack with CI',status:'Planned',links:[],imgs:[]},
+{id:'p3',name:'Project 3: EKS and ArgoCD flagship',status:'Planned',links:[],imgs:[]}]}});
+const norm=r=>{const d=def();return{...d,...r,col:{...d.col,...(r.col||{})}}};
+let S;try{S=norm(JSON.parse(localStorage.getItem(K)||'{}'))}catch(x){S=def()}
+let V={tab:'today',sub:'qs',ed:null,f:{},s:'',ow:new Set()},dd=null,tm;
+const sun=n=>n%7==6,pst=n=>[1,3,5].includes(n%7),wk=n=>Math.floor(n/7);
+const tk=n=>sun(n)?[['l','Reviewed']]:[['l','Learn'],['b','Build'],...(pst(n)?[['p','Post']]:[])];
+const gd=n=>S.days[n]||{},ok=n=>tk(n).every(([k])=>gd(n)[k]),any=n=>tk(n).some(([k])=>gd(n)[k]);
+const sd=()=>new Date(S.start+'T00:00:00'),dt=n=>new Date(sd().getTime()+n*864e5).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}),tn=()=>Math.floor((Date.now()-sd().getTime())/864e5);
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const bc=s=>({Offer:'ok',Published:'ok',Done:'ok',Public:'ok',Rejected:'er',Ghosted:'er',Interview:'wa',Screening:'wa',Building:'wa',Scheduled:'wa'}[s]||'');
+const src=m=>m.id?'/_blob/'+m.id:m.u;
+function save(){S.ts=Date.now();try{localStorage.setItem(K,JSON.stringify(S))}catch(x){V.s='Storage full, export your data';stat()}clearTimeout(tm);tm=setTimeout(push,800)}
+async function push(){if(!dd)return;try{await dd.set({json:JSON.stringify(S),ts:S.ts});V.s='Synced'}catch(x){V.s='Local only'}stat()}
+function stat(){const s=$('#sy');if(s)s.textContent=V.s}
+function toast(m){const t=document.createElement('div');t.id='tt';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2500)}
+const chk=(n,k,l)=>`<label class="ck"><input type="checkbox" data-a="tg" data-n="${n}" data-k="${k}" ${gd(n)[k]?'checked':''}>${l}</label>`;
+function vToday(){const n=tn(),c=Math.max(0,Math.min(90,n)),done=T.filter((_,i)=>ok(i)).length,w=wk(c);
+let st=0,x=Math.min(n,90);if(!any(x)&&x>0)x--;while(x>=0){if(sun(x)&&!any(x)){x--;continue}if(!any(x))break;st++;x--}
+let hrs=0,pd=0,wd=0;for(let i=w*7;i<w*7+7&&i<=90;i++){hrs+=+gd(i).h||0;if(gd(i).p)pd++;if(ok(i))wd++}
+const J=S.col.jobs,miss=[];for(let i=c-1;i>=0&&miss.length<3&&i>c-8;i--)if(!sun(i)&&!ok(i))miss.push(i);
+const td=iso(new Date()),due=J.filter(j=>j.follow&&j.follow<=td&&['Applied','Screening','Interview'].includes(j.status));
+return`<div class="card"><div class="mu">${n<0?'Starts in '+(-n)+' days':n>90?'Plan window ended, keep going':'Today'}</div><h2>Day ${c}: ${e(T[c])}</h2><div class="mu">${dt(c)} · Week ${w+1}</div>${tk(c).map(([k,l])=>chk(c,k,l)).join('')}<button class="btn" data-a="od" data-n="${c}">Notes, links, images</button></div>
+<div class="g"><div class="st"><b>${done}/91</b>days complete</div><div class="st"><b>${st}</b>day streak</div><div class="st"><b>${hrs}</b>hours this week</div><div class="st"><b>${pd}/3</b>posts this week</div>
+<div class="st"><b>${S.col.posts.filter(p=>p.status=='Published').length}</b>posts published</div><div class="st"><b>${J.filter(j=>j.status!='Wishlist').length}</b>applications</div><div class="st"><b>${J.filter(j=>['Screening','Interview','Offer'].includes(j.status)).length}</b>in process</div><div class="st"><b>${S.col.projects.filter(p=>['Done','Public'].includes(p.status)).length}/${S.col.projects.length}</b>projects done</div></div>
+<div class="card"><b>Week ${w+1} progress</b><div class="bar"><i style="width:${Math.round(wd/7*100)}%"></i></div><div class="mu">${wd} of 7 days done</div></div>
+${miss.length?`<div class="card"><b>Catch up</b>${miss.map(i=>`<div class="dr" data-a="od" data-n="${i}"><span>D${i} ${e(T[i])}</span><span class="mu">${dt(i)}</span></div>`).join('')}</div>`:''}
+${due.length?`<div class="card"><b>Follow ups due</b>${due.map(j=>`<div class="dr" data-a="oi" data-k="jobs" data-id="${j.id}"><span>${e(j.company)} ${e(j.role||'')}</span><span class="mu">${e(j.follow)}</span></div>`).join('')}</div>`:''}`}
+function vPlan(){return WK.map((w,i)=>{let d=0;const r=[];for(let j=0;j<7;j++){const n=i*7+j;if(n>90)break;if(ok(n))d++;const g=gd(n);r.push(`<div class="dr" data-a="od" data-n="${n}"><span><b>D${n}</b> ${e(T[n])}${g.note?' 📝':''}${(g.imgs||[]).length?' 🖼':''}${(g.links||[]).length?' 🔗':''}</span><span>${tk(n).map(([k,l])=>`<span class="pl ${g[k]?'on':''}">${l[0]}</span>`).join('')}</span></div>`)}
+return`<details data-w="${i}" ${V.ow.has(String(i))?'open':''}><summary>Week ${i+1}: ${e(w[0])} <span class="mu">${d}/${r.length}</span></summary>${r.join('')}</details>`}).join('')}
+function vList(k){const c=C[k],sf=c.f.find(f=>f[0]=='status'),fl=V.f[k];let L=S.col[k];if(fl)L=L.filter(i=>i.status==fl);
+let sm='';if(k=='jobs'){const J=S.col.jobs,n=s=>J.filter(j=>j.status==s).length;sm=`<div class="mu">Applied ${J.length-n('Wishlist')} · Interviews ${n('Screening')+n('Interview')} · Offers ${n('Offer')}. Target: 10 to 20 applications a week from D47.</div>`}
+return`<div class="hd"><h2>${c.n} <span class="mu">${S.col[k].length}</span></h2><button class="btn" data-a="ad" data-k="${k}">+ Add</button></div>${sm}${sf?`<div class="seg"><button class="${fl?'':'on'}" data-a="fl" data-k="${k}" data-v="">All</button>${sf[3].map(s=>`<button class="${fl==s?'on':''}" data-a="fl" data-k="${k}" data-v="${s}">${s}</button>`).join('')}</div>`:''}
+${L.map(i=>`<div class="card" data-a="oi" data-k="${k}" data-id="${i.id}"><b>${e(i[c.t]||'Untitled')}</b>${i.status?`<span class="bd ${bc(i.status)}">${e(i.status)}</span>`:''}<div class="mu">${c.m(i).filter(Boolean).map(e).join(' · ')}</div></div>`).join('')||'<p class="mu">Nothing here yet. Tap Add.</p>'}`}
+function vStats(){const n=Math.min(tn(),90),hs=[];for(let i=n-13;i<=n;i++)hs.push(i<0?0:+gd(i).h||0);const mx=Math.max(1,...hs),tot=Object.values(S.days).reduce((a,d)=>a+(+d.h||0),0),J=S.col.jobs;
+const rv=Object.keys(S.days).filter(i=>+S.days[i].c&&+S.days[i].c<=2),wq=S.col.qs.filter(q=>+q.conf&&+q.conf<=2);
+return`<div class="card"><b>Hours, last 14 days</b><div class="hist">${hs.map(h=>`<i style="height:${h/mx*100}%"></i>`).join('')}</div><div class="mu">Total ${tot} hours logged</div></div>
+<div class="card"><b>Job funnel</b>${JS.map(s=>{const c=J.filter(j=>j.status==s).length;return`<div class="mu">${s} ${c}</div><div class="bar"><i style="width:${J.length?c/J.length*100:0}%"></i></div>`}).join('')}</div>
+<div class="card"><b>Revisit these days</b>${rv.map(i=>`<div class="dr" data-a="od" data-n="${i}"><span>D${i} ${e(T[i])}</span></div>`).join('')||'<div class="mu">Rate a day 1 or 2 for confidence and it shows up here.</div>'}</div>
+<div class="card"><b>Weak interview questions</b>${wq.map(q=>`<div class="dr" data-a="oi" data-k="qs" data-id="${q.id}"><span>${e(q.q)}</span></div>`).join('')||'<div class="mu">Questions with confidence 1 or 2 show up here.</div>'}</div>`}
+function vData(){return`<div class="card"><label>Day 0 start date<input type="date" id="sd" value="${e(S.start)}"></label><label>Theme<select id="th"><option value="">Auto</option><option ${S.theme=='light'?'selected':''} value="light">Light</option><option ${S.theme=='dark'?'selected':''} value="dark">Dark</option></select></label><div class="mu">Sync: <span id="sy">${e(V.s||'Local only')}</span>. Data is private to you. Export a backup now and then.</div></div>
+<div class="card"><b>Export</b><textarea id="ex" rows="4" readonly>${e(JSON.stringify(S))}</textarea><button class="btn s" data-a="cp">Copy</button></div>
+<div class="card"><b>Import</b><textarea id="im" rows="4" placeholder="Paste exported JSON"></textarea><button class="btn s" data-a="im">Import and replace</button></div>
+<div class="card"><button class="btn d" data-a="rs">Reset everything</button></div>`}
+function vMore(){const s=[['qs','Study'],['res','Resources'],['scores','Scores'],['stats','Stats'],['data','Data']];
+return`<div class="seg">${s.map(([k,l])=>`<button class="${V.sub==k?'on':''}" data-a="sub" data-k="${k}">${l}</button>`).join('')}</div>${V.sub=='stats'?vStats():V.sub=='data'?vData():vList(V.sub)}`}
+function render(){const t=V.tab,v=t=='today'?vToday():t=='plan'?vPlan():t=='more'?vMore():vList(t);
+$('#app').innerHTML=`<div class="hd"><h1>DevOps 90</h1><span class="mu" id="sy">${e(V.s)}</span></div>${v}<div class="nav">${[['today','Today'],['plan','Plan'],['posts','Posts'],['projects','Projects'],['jobs','Jobs'],['more','More']].map(([k,l])=>`<button class="${t==k?'on':''}" data-a="nav" data-k="${k}">${l}</button>`).join('')}</div>`}
+const cur=()=>{const x=V.ed;return!x?null:x.t=='day'?(S.days[x.n]=S.days[x.n]||{}):S.col[x.t].find(i=>i.id==x.id)};
+const att=o=>`<h3>Links</h3>${(o.links||[]).map((l,i)=>`<div class="lk"><a href="${e(l.u)}" target="_blank" rel="noopener">${e(l.t||l.u)}</a><button class="x" data-a="rl" data-i="${i}">×</button></div>`).join('')}<div class="two"><input id="lt" placeholder="Label"><input id="lu" placeholder="https://" inputmode="url"><button class="btn s" data-a="al">Add</button></div>
+<h3>Images and diagrams</h3><div class="imgs">${(o.imgs||[]).map((m,i)=>`<figure><img src="${e(src(m))}" alt="${e(m.c||'diagram')}" data-a="zi" data-i="${i}"><figcaption>${e(m.c||'')}</figcaption><button class="x" data-a="ri" data-i="${i}">×</button></figure>`).join('')}</div><input id="ic" placeholder="Caption for the next image"><label class="btn s" style="display:inline-block">Add image<input type="file" id="fi" accept="image/*" multiple hidden></label>`;
+const fld=(f,o)=>{const[k,l,t,op]=f,v=o[k]==null?'':o[k];if(t=='ta')return`<label>${l}<textarea data-k="${k}" rows="4">${e(v)}</textarea></label>`;
+if(t=='sel')return`<label>${l}<select data-k="${k}">${op.map(x=>`<option ${x==v?'selected':''}>${x}</option>`).join('')}</select></label>`;
+if(t=='chk')return`<b>${l}</b>${op.map(x=>`<label class="ck"><input type="checkbox" data-chk="${x}" ${o.chk&&o.chk[x]?'checked':''}>${x}</label>`).join('')}`;
+return`<label>${l}<input data-k="${k}" type="${t=='num'?'number':t=='date'?'date':'text'}" ${t=='url'?'inputmode="url" placeholder="https://"':''} value="${e(v)}"></label>`};
+function sheet(){const x=V.ed,o=cur();if(!o){$('#sh').innerHTML='';return}let b;
+if(x.t=='day'){const n=x.n;b=`<h2>Day ${n}: ${e(T[n])}</h2><div class="mu">${dt(n)}</div>${tk(n).map(([k,l])=>`<label class="ck"><input type="checkbox" data-task="${k}" ${o[k]?'checked':''}>${l}</label>`).join('')}<label>Hours worked<input type="number" step="0.5" data-k="h" value="${e(o.h)}"></label><label>How well did I understand it, 1 to 5<select data-k="c"><option value="">-</option>${[1,2,3,4,5].map(i=>`<option ${o.c==i?'selected':''}>${i}</option>`).join('')}</select></label><label>Notes, what broke, what I learned<textarea data-k="note" rows="6">${e(o.note)}</textarea></label>${att(o)}`}
+else{b=`<h2>${C[x.t].n}</h2>${C[x.t].f.map(f=>fld(f,o)).join('')}${att(o)}<button class="btn d" data-a="del">Delete</button>`}
+$('#sh').innerHTML=`<div class="bk" data-a="cl"><div class="sh" data-a="no">${b}<button class="btn" data-a="cl">Done</button></div></div>`}
+function close(){const x=V.ed;if(x&&x.t!='day'){const o=cur();if(o&&!o[C[x.t].t]&&!(o.links||[]).length&&!(o.imgs||[]).length){S.col[x.t]=S.col[x.t].filter(i=>i!==o);save()}}V.ed=null;$('#sh').innerHTML='';render()}
+function shrink(f){return createImageBitmap(f).then(bm=>{const r=Math.min(1,1400/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*r);c.height=Math.round(bm.height*r);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(bm,0,0,c.width,c.height);return new Promise(res=>c.toBlob(res,'image/jpeg',.82))})}
+const b2u=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+async function upl(files){const o=cur();if(!o)return;const cap=$('#ic').value;let a=null;try{a=window.claude?await claude.use('assets'):null}catch(x){}
+for(const f of files){try{const b=await shrink(f),m={c:cap};if(a){const r=await a.upload(b);m.id=r.id;m.u=r.url}else m.u=await b2u(b);(o.imgs=o.imgs||[]).push(m)}catch(x){toast('Could not add that image')}}save();sheet()}
+document.addEventListener('click',async ev=>{const t=ev.target.closest('[data-a]');if(!t)return;const a=t.dataset.a,d=t.dataset;
+if(a=='no')return;
+if(a=='nav'){V.tab=d.k;render();scrollTo(0,0)}else if(a=='sub'){V.sub=d.k;render()}
+else if(a=='tg'){const o=S.days[d.n]=S.days[d.n]||{};o[d.k]=t.checked;save();render()}
+else if(a=='od'){V.ed={t:'day',n:+d.n};sheet()}
+else if(a=='oi'){V.ed={t:d.k,id:d.id};sheet()}
+else if(a=='ad'){const o={id:uid(),links:[],imgs:[]};C[d.k].f.forEach(f=>{if(f[2]=='sel')o[f[0]]=f[3][0]});if(d.k=='posts')o.date=iso(new Date());S.col[d.k].unshift(o);V.ed={t:d.k,id:o.id};save();sheet()}
+else if(a=='fl'){V.f[d.k]=d.v;render()}
+else if(a=='cl'){close()}
+else if(a=='al'){const o=cur();let u=$('#lu').value.trim();if(!u)return;if(!/^https?:\/\//i.test(u))u='https://'+u;(o.links=o.links||[]).push({t:$('#lt').value.trim(),u});save();sheet()}
+else if(a=='rl'){cur().links.splice(+d.i,1);save();sheet()}
+else if(a=='ri'){const o=cur(),m=o.imgs[+d.i];o.imgs.splice(+d.i,1);save();sheet();try{if(m.id){const as=await claude.use('assets');if(as)as.delete(m.id)}}catch(x){}}
+else if(a=='zi'){const m=cur().imgs[+d.i],z=$('#z');z.innerHTML='<img src="'+e(src(m))+'" alt="">';z.hidden=false}
+else if(a=='del'){if(t.dataset.c){const x=V.ed;S.col[x.t]=S.col[x.t].filter(i=>i.id!=x.id);save();close()}else{t.dataset.c=1;t.textContent='Tap again to confirm delete'}}
+else if(a=='cp'){const x=$('#ex');x.select();try{await navigator.clipboard.writeText(x.value);toast('Copied')}catch(z){document.execCommand('copy');toast('Copied')}}
+else if(a=='im'){try{const r=JSON.parse($('#im').value);if(!r.days||!r.col)throw 0;S=norm(r);save();render();toast('Imported')}catch(x){toast('That is not valid tracker data')}}
+else if(a=='rs'){if(t.dataset.c){S=def();save();render();toast('Reset done')}else{t.dataset.c=1;t.textContent='Tap again to erase all data'}}});
+$('#z').addEventListener('click',()=>{$('#z').hidden=true});
+document.addEventListener('input',ev=>{const t=ev.target,o=cur();if(!o||t.dataset.k==null)return;o[t.dataset.k]=t.type=='number'?(t.value===''?'':+t.value):t.value;save()});
+document.addEventListener('change',ev=>{const t=ev.target;
+if(t.dataset.task){cur()[t.dataset.task]=t.checked;save()}
+else if(t.dataset.chk){const o=cur();o.chk=o.chk||{};o.chk[t.dataset.chk]=t.checked;save()}
+else if(t.id=='fi'){upl([...t.files])}
+else if(t.id=='sd'&&t.value){S.start=t.value;save();render()}
+else if(t.id=='th'){S.theme=t.value;theme();save()}});
+document.addEventListener('toggle',ev=>{const w=ev.target.dataset&&ev.target.dataset.w;if(w!=null)ev.target.open?V.ow.add(w):V.ow.delete(w)},true);
+function theme(){S.theme?document.documentElement.setAttribute('data-theme',S.theme):document.documentElement.removeAttribute('data-theme')}
+async function boot(){theme();V.ow.add(String(Math.min(12,Math.max(0,wk(tn())))));render();if(!window.claude){V.s='Local only';stat();return}
+try{const[db,us]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!us){V.s='Local only';stat();return}
+const id=await us.id();dd=db.collection('data/users/'+id).doc('tracker');const s=await dd.get();
+if(s.exists){const r=JSON.parse(s.data().json);if((r.ts||0)>(S.ts||0)){S=norm(r);try{localStorage.setItem(K,JSON.stringify(S))}catch(x){}theme();render()}else push()}else if(S.ts)push();else{V.s='Synced';stat()}}
+catch(x){V.s='Local only';stat()}}
+boot();
+</script></body></html>
