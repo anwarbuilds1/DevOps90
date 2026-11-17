@@ -1,20 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 import { TrackerState } from '@/types/tracker';
-import { DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_KEY } from '@/utils/supabase/client';
 
-export const getSupabaseUrl = (): string =>
-  process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
-
-export const getSupabaseKey = (): string =>
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey =
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  DEFAULT_SUPABASE_KEY;
+  '';
 
-export const isSupabaseApiClientConfigured = true;
+export const isSupabaseApiClientConfigured = Boolean(
+  supabaseUrl && supabaseKey && supabaseUrl.startsWith('https://')
+);
 
 // Custom node https fetch adapter to prevent undici connect timeouts in Node runtimes
 function nodeHttpsFetch(url: string | URL | Request, options?: RequestInit): Promise<Response> {
-  // If in browser, use native window.fetch
   if (typeof window !== 'undefined') {
     return fetch(url, options);
   }
@@ -99,10 +97,12 @@ if (typeof window === 'undefined') {
 }
 
 // Supabase client instance for server-side operations
-export const supabase = createClient(getSupabaseUrl(), getSupabaseKey(), {
-  auth: { persistSession: false },
-  global: { fetch: nodeHttpsFetch },
-});
+export const supabase = isSupabaseApiClientConfigured
+  ? createClient(supabaseUrl, supabaseKey, {
+      auth: { persistSession: false },
+      global: { fetch: nodeHttpsFetch },
+    })
+  : null;
 
 export async function testSupabaseClientConnection(): Promise<{
   configured: boolean;
@@ -114,7 +114,7 @@ export async function testSupabaseClientConnection(): Promise<{
     return {
       configured: false,
       connected: false,
-      message: 'Supabase URL or Publishable key is missing.',
+      message: 'Supabase URL or Publishable key is missing in environment variables.',
     };
   }
 

@@ -155,7 +155,7 @@ CREATE POLICY "Allow public read and write" ON devops_tracker FOR ALL USING (tru
                 Supabase Database Setup
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                rmqerbjqfgldmszzfmns.supabase.co
+                Cloud persistence status & controls
               </p>
             </div>
           </div>
@@ -237,7 +237,7 @@ CREATE POLICY "Allow public read and write" ON devops_tracker FOR ALL USING (tru
               <span>Supabase SQL Script (devops_tracker table)</span>
             </h3>
             <a
-              href="https://supabase.com/dashboard/project/rmqerbjqfgldmszzfmns/sql"
+              href="https://supabase.com/dashboard/project/_/sql"
               target="_blank"
               rel="noreferrer"
               className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-0.5"
