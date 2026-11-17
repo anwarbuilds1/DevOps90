@@ -1,26 +1,42 @@
 import { NextResponse } from 'next/server';
 import { isDatabaseConfigured, testDbConnection } from '@/lib/db';
+import {
+  isSupabaseApiClientConfigured,
+  testSupabaseClientConnection,
+} from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const configured = isDatabaseConfigured();
-  if (!configured) {
+  const hasDbUrl = isDatabaseConfigured();
+  const hasSupabaseClient = isSupabaseApiClientConfigured;
+
+  if (hasDbUrl) {
+    const testResult = await testDbConnection();
     return NextResponse.json({
-      configured: false,
-      connected: false,
-      mode: 'local_storage',
-      message: 'No DATABASE_URL configured in environment variables. Operating in local storage mode.',
+      configured: true,
+      connected: testResult.success,
+      mode: testResult.success ? 'supabase_postgres' : 'connection_error',
+      message: testResult.message,
+      timestamp: testResult.timestamp,
     });
   }
 
-  const testResult = await testDbConnection();
+  if (hasSupabaseClient) {
+    const testResult = await testSupabaseClientConnection();
+    return NextResponse.json({
+      configured: true,
+      connected: testResult.connected,
+      tableMissing: testResult.tableMissing,
+      mode: testResult.connected ? 'supabase_api' : 'supabase_pending_table',
+      message: testResult.message,
+    });
+  }
 
   return NextResponse.json({
-    configured: true,
-    connected: testResult.success,
-    mode: testResult.success ? 'supabase_postgres' : 'connection_error',
-    message: testResult.message,
-    timestamp: testResult.timestamp,
+    configured: false,
+    connected: false,
+    mode: 'local_storage',
+    message: 'Operating in browser Local Storage mode. Ready for Supabase.',
   });
 }
